@@ -1,11 +1,12 @@
 import os
-import re
 import requests
 from flask import Flask, render_template, request, redirect, url_for
 
+# PORT環境変数からポート番号を読み込む（デフォルトは8080）
+APP_PORT = int(os.environ.get('PORT', 8080))
 app = Flask(__name__)
 
-# 環境変数を読み込み
+# OpenShift APIのエンドポイントと認証情報を環境変数から取得
 OPENSHIFT_API_URL = os.environ.get('OPENSHIFT_API_URL')
 TOKEN = os.environ.get('TOKEN')
 NAMESPACE = os.environ.get('NAMESPACE')
@@ -14,7 +15,7 @@ NAMESPACE = os.environ.get('NAMESPACE')
 def index():
     return """
     <h1>コンテナデプロイ</h1>
-    <p>デプロイしたいコンテナイメージ名を入力してください。</p>
+    <p>デプロイしたいコンテナイメージ名を入力してください。{NAMESPACE}</p>
     <form action="/deploy" method="post">
         <label for="image_name">コンテナイメージ名：</label>
         <input type="text" id="image_name" name="image_name" placeholder="例: quay.io/openshift/hello-openshift" required>
@@ -26,28 +27,24 @@ def index():
 def deploy():
     image_name = request.form['image_name']
     
-    # イメージ名を正規化し、Kubernetesの命名規則に準拠させる
-    # 小文字の英数字とハイフンのみを許可
-    normalized_name = re.sub(r'[^a-z0-9-]', '-', image_name.lower())
-    
-    # Podを作成するJobのマニフェストを生成
+    # ユーザー入力からJobマニフェストを生成
     job_manifest = {
         "apiVersion": "batch/v1",
         "kind": "Job",
         "metadata": {
-            "generateName": f"{normalized_name}-pod-"
+            "generateName": "container-deployer-"
         },
         "spec": {
             "template": {
                 "spec": {
                     "containers": [
                         {
-                            "name": f"{normalized_name}-container",
-                            "image": image_name,
+                            "name": "deployer-job",
+                            "image": "docker.io/curlimages/curl", # curlを使ってOpenShift APIを叩くイメージ
                             "command": [
                                 "/bin/sh",
                                 "-c",
-                                f"curl -s -k --header 'Authorization: Bearer {TOKEN}' --header 'Content-Type: application/json' --request POST --data '{{\"apiVersion\":\"v1\",\"kind\":\"Pod\",\"metadata\":{{\"generateName\":\"{normalized_name}-pod-\"}},\"spec\":{{\"containers\":[{{\"name\":\"{normalized_name}-container\",\"image\":\"{image_name}\"}}],\"restartPolicy\":\"Never\"}}}}' {OPENSHIFT_API_URL}/api/v1/namespaces/{NAMESPACE}/pods"
+                                f"curl -s -k --header 'Authorization: Bearer {TOKEN}' --header 'Content-Type: application/json' --request POST --data '{{\"apiVersion\":\"v1\",\"kind\":\"Pod\",\"metadata\":{{\"generateName\":\"{image_name.replace('/', '-')}-pod-\"}},\"spec\":{{\"containers\":[{{\"name\":\"{image_name.replace('/', '-')}-container\",\"image\":\"{image_name}\"}}],\"restartPolicy\":\"Never\"}}}}' {OPENSHIFT_API_URL}/api/v1/namespaces/{NAMESPACE}/pods"
                             ]
                         }
                     ],
@@ -74,6 +71,5 @@ def deploy():
         return f"<h1>通信エラー</h1><p>エラー: {str(e)}</p>"
 
 if __name__ == '__main__':
-    # PORT環境変数が設定されていなければ8080を使用
-    APP_PORT = int(os.environ.get('PORT', 8080))
+    ## app.run(host='0.0.0.0', port=8081)
     app.run(host='0.0.0.0', port=APP_PORT)
