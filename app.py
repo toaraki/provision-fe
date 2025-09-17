@@ -45,7 +45,7 @@ def deploy():
                             "name": f"{normalized_name}-container",
                             "image": image_name,
                             "command": [
-                                "/bin/sh",
+                                "/bin/bash",
                                 "-c",
                                 f"curl -s -k --header 'Authorization: Bearer {TOKEN}' --header 'Content-Type: application/json' --request POST --data '{{\"apiVersion\":\"v1\",\"kind\":\"Pod\",\"metadata\":{{\"generateName\":\"{normalized_name}-pod-\"}},\"spec\":{{\"containers\":[{{\"name\":\"{normalized_name}-container\",\"image\":\"{image_name}\"}}],\"restartPolicy\":\"Never\"}}}}' {OPENSHIFT_API_URL}/api/v1/namespaces/{NAMESPACE}/pods"
                             ]
