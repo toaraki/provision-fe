@@ -13,7 +13,7 @@ NAMESPACE = os.environ.get('NAMESPACE')
 def index():
     return """
     <h1>コンテナデプロイ</h1>
-    <p>デプロイしたいコンテナイメージ名を入力してください。</p>
+    <p>デプロイしたいコンテナイメージ名を入力してください。{NAMESPACE}</p>
     <form action="/deploy" method="post">
         <label for="image_name">コンテナイメージ名：</label>
         <input type="text" id="image_name" name="image_name" placeholder="例: quay.io/openshift/hello-openshift" required>
