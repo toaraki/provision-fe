@@ -2,6 +2,8 @@ import os
 import requests
 from flask import Flask, render_template, request, redirect, url_for
 
+# PORT環境変数からポート番号を読み込む（デフォルトは8080）
+APP_PORT = int(os.environ.get('PORT', 8080))
 app = Flask(__name__)
 
 # OpenShift APIのエンドポイントと認証情報を環境変数から取得
@@ -69,4 +71,5 @@ def deploy():
         return f"<h1>通信エラー</h1><p>エラー: {str(e)}</p>"
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8081)
+    ## app.run(host='0.0.0.0', port=8081)
+    app.run(host='0.0.0.0', port=APP_PORT)
