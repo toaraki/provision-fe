@@ -43,7 +43,7 @@ def deploy():
                     "containers": [
                         {
                             "name": f"{normalized_name}-container",
-                            "image": image_name,
+                            "image": "docker.io/alpine/curl",
                             "command": [
                                 "/bin/bash",
                                 "-c",
