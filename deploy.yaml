@@ -24,6 +24,11 @@ spec:
               value: "https://kubernetes.default.svc"
             - name: NAMESPACE
               value: "virt-provision" 
+            - name: TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: provisioning-sa-token-job-creator-sa-dockercfg-j7ng2
+                  key: token
             - name: PORT
               value: "8080"
           resources:
