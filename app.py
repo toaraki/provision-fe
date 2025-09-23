@@ -44,7 +44,7 @@ def deploy():
                     "containers": [
                         {
                             "name": "deployer-job",
-                            "image": "registry.redhat.io/rhel8/support-tools:latest",
+                            "image": "image-registry.openshift-image-registry.svc:5000/user20-vm-iac/provision-fe-git:latest",
                             "command": ["/bin/bash", "-c"],
                             "args": [
                                 f"set -e; "
