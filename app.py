@@ -50,7 +50,7 @@ def deploy():
                                 f"set -e; "
                                 f"VM_NAME='{normalized_hostname}'; "
                                 f"TEMPLATE_URL='https://raw.githubusercontent.com/toaraki/vm-templates/main/vm-fedora-template.yaml'; "
-                                f"export PATH=/usr/local/bin:${PATH}"
+                                f"export PATH=/usr/local/bin:$PATH"
                                 f"ls /usr/local/bin"
                                 f"curl -s -k -L $TEMPLATE_URL | sed 's/{{{{ .hostname }}}}/{normalized_hostname}/g' | oc apply -f -; "
                                 f"echo 'Waiting for VM to be ready...'; "
