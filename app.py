@@ -46,7 +46,7 @@ def deploy():
                             "image": "registry.redhat.io/openshift4/ose-cli:latest",
                             "command": ["/bin/bash", "-c"],
                             "args": [
-                                f"curl -s -k -L https://raw.githubusercontent.com/toaraki/vm-templates/blob/main/vm-fedora-template.yaml | sed 's/{{{{ .hostname }}}}/{normalized_hostname}/g' | oc apply -f -"
+                                f"curl -s -k -L https://raw.githubusercontent.com/toaraki/vm-templates/main/vm-fedora-template.yaml | sed 's/{{{{ .hostname }}}}/{normalized_hostname}/g' | oc apply -f -"
                             ]
                         }
                     ],
