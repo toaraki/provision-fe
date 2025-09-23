@@ -44,7 +44,7 @@ def deploy():
                     "containers": [
                         {
                             "name": "deployer-job",
-                            "image": "registry.redhat.io/openshift4/ose-cli:latest",
+                            "image": "registry.redhat.io/rhel8/support-tools:latest",
                             "command": ["/bin/bash", "-c"],
                             "args": [
                                 f"set -e; "
