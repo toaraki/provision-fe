@@ -40,6 +40,7 @@ def deploy():
         "spec": {
             "template": {
                 "spec": {
+                    "serviceAccountName": "provisioning-sa",
                     "containers": [
                         {
                             "name": "deployer-job",
