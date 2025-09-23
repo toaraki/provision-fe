@@ -43,7 +43,7 @@ def deploy():
                     "containers": [
                         {
                             "name": "deployer-job",
-                            "image": "registry.access.redhat.com/openshift4/ose-cli:latest",
+                            "image": "registry.redhat.io/openshift4/ose-cli:latest",
                             "command": ["/bin/bash", "-c"],
                             "args": [
                                 f"curl -s -k -L https://raw.githubusercontent.com/<あなたのユーザー名>/<あなたのリポジトリ名>/main/vm-template.yaml | sed 's/{{{{ .hostname }}}}/{normalized_hostname}/g' | oc apply -f -"
