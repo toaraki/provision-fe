@@ -57,7 +57,7 @@ def deploy():
                                 f"oc wait --for=condition=ready --timeout=300s vm/$VM_NAME; "
     
                                 f"echo 'Getting VM IP address...'; "
-                                f"VM_IP=$(oc get vm $VM_NAME -o jsonpath='{{.status.interfaces[0].ipAddress}}'); "
+                                f"VM_IP=$(oc get vmi $VM_NAME -o jsonpath='{{.status.interfaces[0].ipAddress}}'); "
     
                                 f"echo 'Waiting for network connectivity...'; "
                                 f"for i in {{1..20}}; do "
