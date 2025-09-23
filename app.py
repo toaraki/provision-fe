@@ -44,7 +44,7 @@ def deploy():
                     "containers": [
                         {
                             "name": "deployer-job",
-                            "image": "image-registry.openshift-image-registry.svc:5000/user20-vm-iac/provision-fe-git:latest",
+                            "image": "registry.redhat.io/openshift4/ose-cli:latest",
                             "command": ["/bin/bash", "-c"],
                             "args": [
                                 f"set -e; "
@@ -61,11 +61,11 @@ def deploy():
     
                                 f"echo 'Waiting for network connectivity...'; "
                                 f"for i in {{1..20}}; do "
-                                f"  if ping -c 1 $VM_IP > /dev/null; then "
-                                f"    echo 'Ping successful, VM is ready.'; "
+                                f"  if nc -z -w5 $(oc get vm $VM_NAME -o jsonpath='{{.status.interfaces[0].ipAddress}}') 22; then "
+                                f"    echo 'SSH port is open, VM is ready.'; "
                                 f"    exit 0; "
                                 f"  else "
-                                f"    echo 'Ping failed, waiting...'; "
+                                f"    echo 'SSH port is not open, waiting...'; "
                                 f"    sleep 5; "
                                 f"  fi; "
                                 f"done; "
