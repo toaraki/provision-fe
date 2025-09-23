@@ -27,7 +27,7 @@ spec:
             - name: TOKEN
               valueFrom:
                 secretKeyRef:
-                  name: provisioning-sa-token-job-creator-sa-dockercfg-j7ng2
+                  name: provisioning-sa-token
                   key: token
             - name: PORT
               value: "8080"
