@@ -47,7 +47,29 @@ def deploy():
                             "image": "registry.redhat.io/openshift4/ose-cli:latest",
                             "command": ["/bin/bash", "-c"],
                             "args": [
-                                f"curl -s -k -L https://raw.githubusercontent.com/toaraki/vm-templates/main/vm-fedora-template.yaml | sed 's/{{{{ .hostname }}}}/{normalized_hostname}/g' | oc apply -f -"
+                                f"set -e; "
+                                f"VM_NAME='{normalized_hostname}'; "
+                                f"TEMPLATE_URL='https://raw.githubusercontent.com/toaraki/vm-templates/main/vm-fedora-template.yaml'; "
+                                f"curl -s -k -L $TEMPLATE_URL | sed 's/{{{{ .hostname }}}}/{normalized_hostname}/g' | oc apply -f -; "
+                                f"echo 'Waiting for VM to be ready...'; "
+                                f"oc wait --for=condition=ready --timeout=300s vm/$VM_NAME; "
+    
+                                f"echo 'Getting VM IP address...'; "
+                                f"VM_IP=$(oc get vm $VM_NAME -o jsonpath='{{.status.interfaces[0].ipAddress}}'); "
+    
+                                f"echo 'Waiting for network connectivity...'; "
+                                f"for i in {{1..20}}; do "
+                                f"  if ping -c 1 $VM_IP > /dev/null; then "
+                                f"    echo 'Ping successful, VM is ready.'; "
+                                f"    exit 0; "
+                                f"  else "
+                                f"    echo 'Ping failed, waiting...'; "
+                                f"    sleep 5; "
+                                f"  fi; "
+                                f"done; "
+    
+                                f"echo 'VM network not available within timeout.'; "
+                                f"exit 1;"
                             ]
                         }
                     ],
