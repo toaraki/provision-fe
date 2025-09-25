@@ -97,7 +97,7 @@ def deploy():
                                 f"if [ -z '$VM_IP' ]; then echo 'VM IP address not found within timeout.'; exit 1; fi; "
 
                                 f"echo 'Waiting for application to be ready...'; "
-                                f"for i in {{1..20}}; do "
+                                f"for j in {{1..20}}; do "
                                 # Curl checks for HTTP success (2xx or 3xx status codes)
                                 f"  STATUS_CODE=$(curl -s -o /dev/null -w '%{{http_code}}' --max-time 10 http://$VM_IP:3000); "
                                 f"  echo '$STATUS_CODE' ; "
