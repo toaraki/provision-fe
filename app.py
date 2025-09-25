@@ -101,6 +101,10 @@ def deploy():
                                 # Curl checks for HTTP success (2xx or 3xx status codes)
                                 f"  STATUS_CODE=$(curl -s -o /dev/null -w '%{{http_code}}' --max-time 10 http://$VM_IP:3000); "
                                 f"  echo '$STATUS_CODE' ; "
+                                f"  if [ \"$STATUS_CODE\" == \"000\" ]; then "
+                                f"    echo 'Connection failed, waiting...'; "
+                                f"    sleep 5; "
+                                f"  else "
                                 f"  if [ \"$STATUS_CODE\" -ge 200 ] && [ \"$STATUS_CODE\" -lt 400 ]; then "
                                 #f"  if curl -s -o /dev/null -w '%{{http_code}}' --max-time 10 http://$VM_IP:3000 | grep -E '^(2|3)[0-9]{2}$'; then "
                                 f"    echo 'Application is ready.'; "
