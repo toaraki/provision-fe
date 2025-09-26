@@ -6,14 +6,17 @@
 <body>
     <h1>VM デプロイ状況</h1>
     <div id="status-message">処理中です...</div>
+    <pre id="logs-container"></pre>
     <div id="result"></div>
 
     <script>
         const jobName = "{{ job_name }}";
         const statusMessage = document.getElementById('status-message');
+        const logsContainer = document.getElementById('logs-container');
         const resultDiv = document.getElementById('result');
+        let jobStatusChecked = false;
 
-        function checkStatus() {
+        function checkJobCompletion() {
             fetch(`/api/job-status/${jobName}`)
                 .then(response => response.json())
                 .then(data => {
@@ -24,18 +27,35 @@
                         statusMessage.textContent = 'デプロイに失敗しました。';
                         resultDiv.textContent = `エラー: ${data.message}`;
                     } else {
-                        // 処理中
-                        statusMessage.textContent = data.message;
-                        setTimeout(checkStatus, 5000); // 5秒後に再チェック
+                        // Jobが完了していない場合、完了をチェックし続ける
+                        setTimeout(checkJobCompletion, 5000);
                     }
                 })
                 .catch(error => {
-                    console.error('Error:', error);
-                    statusMessage.textContent = 'エラーが発生しました。';
+                    console.error('Error checking status:', error);
                 });
         }
 
-        window.onload = checkStatus;
+        function streamLogs() {
+            const eventSource = new EventSource(`/api/job-logs/${jobName}`);
+            eventSource.onmessage = function(event) {
+                const line = event.data;
+                logsContainer.textContent += line + '\n';
+                logsContainer.scrollTop = logsContainer.scrollHeight;
+            };
+
+            eventSource.onerror = function(error) {
+                console.error('EventSource failed:', error);
+                eventSource.close();
+                // ログストリームが終了したら、ジョブの最終状態をチェックする
+                if (!jobStatusChecked) {
+                    checkJobCompletion();
+                    jobStatusChecked = true;
+                }
+            };
+        }
+
+        window.onload = streamLogs;
     </script>
 </body>
 </html>

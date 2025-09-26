@@ -159,6 +159,39 @@ def get_job_status(job_name):
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)})
 
+
+from flask import jsonify, Response
+
+@app.route('/api/job-logs/<job_name>', methods=['GET'])
+def get_job_logs(job_name):
+    headers = {
+        "Authorization": f"Bearer {TOKEN}",
+        "Content-Type": "application/json"
+    }
+
+    try:
+        # まず、JobのPod名を取得
+        pod_name = f"{job_name}-pod" 
+        
+        # Podのログを取得するAPI URLを構築
+        logs_url = f"{OPENSHIFT_API_URL}/api/v1/namespaces/{NAMESPACE}/pods/{pod_name}/log"
+        
+        # ログをストリーミングで取得する
+        response = requests.get(logs_url, headers=headers, stream=True, verify=False)
+        
+        if response.status_code == 200:
+            def generate_logs():
+                for line in response.iter_lines():
+                    yield f"data: {line.decode('utf-8')}\n\n"
+            
+            return Response(generate_logs(), mimetype="text/event-stream")
+        else:
+            return jsonify({"status": "error", "message": "Log stream not available."})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)})
+        
+
+
 if __name__ == '__main__':
     APP_PORT = int(os.environ.get('PORT', 8080))
     app.run(host='0.0.0.0', port=APP_PORT)
