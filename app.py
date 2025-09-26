@@ -96,8 +96,8 @@ def deploy():
 #                                f"exit 1;"
 #                            ]
                             "args": [
-                                f"/bin/bash",
-                                "-c",
+                                #f"/bin/bash",
+                                #"-c",
                                 f"set -e; "
                                 f"VM_NAME='{normalized_hostname}'; "
                                 f"TEMPLATE_URL='https://raw.githubusercontent.com/toaraki/vm-templates/main/vm-fedora-template.yaml'; "
