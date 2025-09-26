@@ -29,13 +29,15 @@ def deploy():
     
     # ホスト名をKubernetesの命名規則に準拠させる
     normalized_hostname = re.sub(r'[^a-z0-9-]', '-', hostname.lower())
+    # Jobを追跡するための一意な名前を生成
+    job_name = f"vm-deployer-{normalized_hostname}-{os.urandom(4).hex()}"
     
     # Jobを作成するマニフェストを生成
     job_manifest = {
         "apiVersion": "batch/v1",
         "kind": "Job",
         "metadata": {
-            "generateName": f"vm-deployer-"
+            "name": job_name
         },
         "spec": {
             "template": {
@@ -47,54 +49,6 @@ def deploy():
                             # "image": "registry.redhat.io/openshift4/ose-cli:latest",
                             "image": "image-registry.openshift-image-registry.svc:5000/user20-vm-iac/job-runner-image:latest",
                             "command": ["/bin/bash", "-c"],
-#                            "args": [
-#                                f"set -e; "
-#                                f"VM_NAME='{normalized_hostname}'; "
-#                                f"TEMPLATE_URL='https://raw.githubusercontent.com/toaraki/vm-templates/main/vm-fedora-template.yaml'; "
-#    
-#                                f"echo 'Deploying VM...'; "
-#                                f"curl -s -k -L $TEMPLATE_URL | sed 's/{{{{ .hostname }}}}/{normalized_hostname}/g' | oc apply -f -; "
-#    
-#                                f"echo 'Waiting for VM to be ready...'; "
-#                                f"oc wait --for=condition=ready --timeout=300s vm/$VM_NAME; "
-#    
-#                                f"echo 'Getting VM IP address...'; "
-#                                f"VM_IP=''; "
-#                                f"for i in {{1..60}}; do "
-#                                f"  VM_IP=$(oc get vmi $VM_NAME -o jsonpath='{{.status.interfaces[0].ipAddress}}' || true); "
-#                                f"  if [ ! -z '$VM_IP' ]; then "
-#                                f"    echo 'IP address found: '$VM_IP; "
-#                                f"    break; "
-#                                f"  fi; "
-#                                f"  echo 'IP not available, waiting...'; "
-#                                f"  sleep 2; "
-#                                f"done; "
-#    
-#                                f"if [ -z '$VM_IP' ]; then echo 'VM IP address not found within timeout.'; exit 1; fi; "
-#
-#                                f"echo 'Waiting for application to be ready...'; "
-#
-#                                f"for j in {{1..20}}; do "
-#                                f"  echo 'check application status'; "
-#                                # Curl checks for HTTP success (2xx or 3xx status codes)
-#                                f"  STATUS_CODE=$(curl -s -o /dev/null -w '%{{http_code}}' --max-time 10 http://$VM_IP:3000 || true); "
-#                                # f"  echo $STATUS_CODE; "
-#                                f"  if [ \"$STATUS_CODE\" == \"000\" ]; then "
-#                                f"    echo 'Connection failed, waiting...'; "
-#                                f"    sleep 5; "
-#                                f"  elif [ \"$STATUS_CODE\" -ge 200 ] && [ \"$STATUS_CODE\" -lt 400 ]; then "
-#                                #f"  if curl -s -o /dev/null -w '%{{http_code}}' --max-time 10 http://$VM_IP:3000 | grep -E '^(2|3)[0-9]{2}$'; then "
-#                                f"    echo 'Application is ready.'; "
-#                                f"    exit 0; "
-#                                f"  else "
-#                                f"    echo 'Application not ready, waiting...'; "
-#                                f"    sleep 5; "
-#                                f"  fi; "
-#                                f"done; "
-#    
-#                                f"echo 'Application not ready within timeout.'; "
-#                                f"exit 1;"
-#                            ]
                             "args": [
                                 #f"/bin/bash",
                                 #"-c",
@@ -123,6 +77,9 @@ def deploy():
                                 f"  STATUS_CODE=$(curl -s -o /dev/null -w '%{{http_code}}' --max-time 10 http://$VM_IP:3000 || true); "
                                 f"  if [ \"$STATUS_CODE\" -ge 200 ] && [ \"$STATUS_CODE\" -lt 400 ]; then "
                                 f"    echo 'Application is ready.'; "
+                                # Dynamically get the Route URL from the cluster
+                                f"      ROUTER_URL=$(oc get route {normalized_hostname} -o jsonpath='{{.spec.host}}'); "
+                                f"      echo 'VM_URL=https://$ROUTER_URL'; "
                                 f"    exit 0; "
                                 f"  else "
                                 f"    echo 'Application not ready, waiting...'; "
@@ -145,16 +102,66 @@ def deploy():
         "Content-Type": "application/json"
     }
 
+    # JobをOpenShift APIに送信し、ステータスページにリダイレクト
     try:
         api_url = f"{OPENSHIFT_API_URL}/apis/batch/v1/namespaces/{NAMESPACE}/jobs"
         response = requests.post(api_url, json=job_manifest, headers=headers, verify=False)
         if response.status_code == 201:
-            return f"<h1>VM デプロイ開始！</h1><p>VM: {hostname} のデプロイを開始しました。</p>"
+            return redirect(url_for('status_page', job_name=job_name))
         else:
-            return f"<h1>VM デプロイ失敗</h1><p>エラー: {response.text}</p>"
+            return f"<h1>デプロイ失敗</h1><p>エラー: {response.text}</p>"
     except Exception as e:
         return f"<h1>通信エラー</h1><p>エラー: {str(e)}</p>"
+
+
+
+from flask import jsonify
+
+@app.route('/status/<job_name>')
+def status_page(job_name):
+    # status.html テンプレートをレンダリングし、ジョブ名を渡す
+    return render_template('status.html', job_name=job_name)
+
+@app.route('/api/job-status/<job_name>')
+def get_job_status(job_name):
+    # JobのステータスをチェックするAPIエンドポイント
+    headers = {
+        "Authorization": f"Bearer {TOKEN}",
+        "Content-Type": "application/json"
+    }
+
+    try:
+        api_url = f"{OPENSHIFT_API_URL}/apis/batch/v1/namespaces/{NAMESPACE}/jobs/{job_name}"
+        response = requests.get(api_url, headers=headers, verify=False)
+
+        if response.status_code == 200:
+            job = response.json()
+            status = job.get('status', {})
+            if status.get('succeeded'):
+                # 成功した場合、PodのログからURLを取得
+                pod_name = job['metadata']['name'] + '-pod' # Job名からPod名を推測
+                logs_url = f"{OPENSHIFT_API_URL}/api/v1/namespaces/{NAMESPACE}/pods/{pod_name}/log"
+                logs_response = requests.get(logs_url, headers=headers, verify=False)
+                
+                # ログからURLを抽出
+                vm_url = ""
+                for line in logs_response.text.splitlines():
+                    if line.startswith('VM_URL='):
+                        vm_url = line.replace('VM_URL=', '')
+                        break
+                
+                return jsonify({"status": "succeeded", "url": vm_url})
+            elif status.get('failed'):
+                return jsonify({"status": "failed", "error": "Job failed"})
+            else:
+                return jsonify({"status": "running", "message": "VMをデプロイ中です..."})
+        else:
+            return jsonify({"status": "error", "message": "Jobが見つかりません"})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)})
 
 if __name__ == '__main__':
     APP_PORT = int(os.environ.get('PORT', 8080))
     app.run(host='0.0.0.0', port=APP_PORT)
+
+
