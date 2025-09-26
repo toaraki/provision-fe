@@ -79,6 +79,8 @@ def deploy():
                                 f"    echo 'Application is ready.'; "
                                 # Dynamically get the Route URL from the cluster
                                 f"      ROUTER_URL=$(oc get route {normalized_hostname} -o jsonpath='{{.spec.host}}'); "
+                                f"      echo 'Creating ConfigMap with VM URL...'; "
+                                f"      oc create configmap {job_name}-url --from-literal=url=https://$ROUTER_URL; "
                                 f"      echo 'VM_URL=https://$ROUTER_URL'; "
                                 f"    exit 0; "
                                 f"  else "
@@ -131,32 +133,29 @@ def get_job_status(job_name):
     }
 
     try:
+        # Check Job status first
         api_url = f"{OPENSHIFT_API_URL}/apis/batch/v1/namespaces/{NAMESPACE}/jobs/{job_name}"
         response = requests.get(api_url, headers=headers, verify=False)
+        job = response.json()
 
-        if response.status_code == 200:
-            job = response.json()
-            status = job.get('status', {})
-            if status.get('succeeded'):
-                # 成功した場合、PodのログからURLを取得
-                pod_name = job['metadata']['name'] + '-pod' # Job名からPod名を推測
-                logs_url = f"{OPENSHIFT_API_URL}/api/v1/namespaces/{NAMESPACE}/pods/{pod_name}/log"
-                logs_response = requests.get(logs_url, headers=headers, verify=False)
-                
-                # ログからURLを抽出
-                vm_url = ""
-                for line in logs_response.text.splitlines():
-                    if line.startswith('VM_URL='):
-                        vm_url = line.replace('VM_URL=', '')
-                        break
-                
+        status = job.get('status', {})
+        if status.get('succeeded'):
+            # Job succeeded, now check for the ConfigMap
+            configmap_url = f"{OPENSHIFT_API_URL}/api/v1/namespaces/{NAMESPACE}/configmaps/{job_name}-url"
+            configmap_response = requests.get(configmap_url, headers=headers, verify=False)
+            
+            if configmap_response.status_code == 200:
+                configmap_data = configmap_response.json().get('data', {})
+                vm_url = configmap_data.get('url', '')
                 return jsonify({"status": "succeeded", "url": vm_url})
-            elif status.get('failed'):
-                return jsonify({"status": "failed", "error": "Job failed"})
             else:
-                return jsonify({"status": "running", "message": "VMをデプロイ中です..."})
+                return jsonify({"status": "error", "message": "Job succeeded but URL not found"})
+
+        elif status.get('failed'):
+            return jsonify({"status": "failed", "error": "Job failed"})
         else:
-            return jsonify({"status": "error", "message": "Jobが見つかりません"})
+            return jsonify({"status": "running", "message": "VMをデプロイ中です..."})
+
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)})
 
