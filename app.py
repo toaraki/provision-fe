@@ -51,37 +51,60 @@ def deploy():
 #                                f"set -e; "
 #                                f"VM_NAME='{normalized_hostname}'; "
 #                                f"TEMPLATE_URL='https://raw.githubusercontent.com/toaraki/vm-templates/main/vm-fedora-template.yaml'; "
+#    
+#                                f"echo 'Deploying VM...'; "
 #                                f"curl -s -k -L $TEMPLATE_URL | sed 's/{{{{ .hostname }}}}/{normalized_hostname}/g' | oc apply -f -; "
+#    
 #                                f"echo 'Waiting for VM to be ready...'; "
 #                                f"oc wait --for=condition=ready --timeout=300s vm/$VM_NAME; "
 #    
 #                                f"echo 'Getting VM IP address...'; "
-#                                f"VM_IP=$(oc get vmi $VM_NAME -o jsonpath='{{.status.interfaces[0].ipAddress}}'); "
+#                                f"VM_IP=''; "
+#                                f"for i in {{1..60}}; do "
+#                                f"  VM_IP=$(oc get vmi $VM_NAME -o jsonpath='{{.status.interfaces[0].ipAddress}}' || true); "
+#                                f"  if [ ! -z '$VM_IP' ]; then "
+#                                f"    echo 'IP address found: '$VM_IP; "
+#                                f"    break; "
+#                                f"  fi; "
+#                                f"  echo 'IP not available, waiting...'; "
+#                                f"  sleep 2; "
+#                                f"done; "
 #    
-#                                f"echo 'Waiting for network connectivity...'; "
-#                                f"for i in {{1..20}}; do "
-#                                f"  if ping -c 1 $VM_IP > /dev/null; then "
-#                                f"    echo 'Ping successful, VM is ready.'; "
+#                                f"if [ -z '$VM_IP' ]; then echo 'VM IP address not found within timeout.'; exit 1; fi; "
+#
+#                                f"echo 'Waiting for application to be ready...'; "
+#
+#                                f"for j in {{1..20}}; do "
+#                                f"  echo 'check application status'; "
+#                                # Curl checks for HTTP success (2xx or 3xx status codes)
+#                                f"  STATUS_CODE=$(curl -s -o /dev/null -w '%{{http_code}}' --max-time 10 http://$VM_IP:3000 || true); "
+#                                # f"  echo $STATUS_CODE; "
+#                                f"  if [ \"$STATUS_CODE\" == \"000\" ]; then "
+#                                f"    echo 'Connection failed, waiting...'; "
+#                                f"    sleep 5; "
+#                                f"  elif [ \"$STATUS_CODE\" -ge 200 ] && [ \"$STATUS_CODE\" -lt 400 ]; then "
+#                                #f"  if curl -s -o /dev/null -w '%{{http_code}}' --max-time 10 http://$VM_IP:3000 | grep -E '^(2|3)[0-9]{2}$'; then "
+#                                f"    echo 'Application is ready.'; "
 #                                f"    exit 0; "
 #                                f"  else "
-#                                f"    echo 'Ping failed, waiting...'; "
+#                                f"    echo 'Application not ready, waiting...'; "
 #                                f"    sleep 5; "
 #                                f"  fi; "
-#                                f"done; " 
-#                                f"echo 'VM network not available within timeout.'; "
+#                                f"done; "
+#    
+#                                f"echo 'Application not ready within timeout.'; "
 #                                f"exit 1;"
 #                            ]
                             "args": [
+                                f"/bin/bash",
+                                "-c",
                                 f"set -e; "
                                 f"VM_NAME='{normalized_hostname}'; "
                                 f"TEMPLATE_URL='https://raw.githubusercontent.com/toaraki/vm-templates/main/vm-fedora-template.yaml'; "
-    
                                 f"echo 'Deploying VM...'; "
                                 f"curl -s -k -L $TEMPLATE_URL | sed 's/{{{{ .hostname }}}}/{normalized_hostname}/g' | oc apply -f -; "
-    
                                 f"echo 'Waiting for VM to be ready...'; "
                                 f"oc wait --for=condition=ready --timeout=300s vm/$VM_NAME; "
-    
                                 f"echo 'Getting VM IP address...'; "
                                 f"VM_IP=''; "
                                 f"for i in {{1..60}}; do "
@@ -93,29 +116,24 @@ def deploy():
                                 f"  echo 'IP not available, waiting...'; "
                                 f"  sleep 2; "
                                 f"done; "
-    
                                 f"if [ -z '$VM_IP' ]; then echo 'VM IP address not found within timeout.'; exit 1; fi; "
-
                                 f"echo 'Waiting for application to be ready...'; "
-
-                                f"for j in {{1..20}}; do "
-                                f"  echo 'check application status'; "
-                                # Curl checks for HTTP success (2xx or 3xx status codes)
+                                f"for i in {{1..20}}; do "
                                 f"  STATUS_CODE=$(curl -s -o /dev/null -w '%{{http_code}}' --max-time 10 http://$VM_IP:3000); "
-                                # f"  echo $STATUS_CODE; "
-                                f"  if [ \"$STATUS_CODE\" == \"000\" ]; then "
-                                f"    echo 'Connection failed, waiting...'; "
-                                f"    sleep 5; "
-                                f"  elif [ \"$STATUS_CODE\" -ge 200 ] && [ \"$STATUS_CODE\" -lt 400 ]; then "
-                                #f"  if curl -s -o /dev/null -w '%{{http_code}}' --max-time 10 http://$VM_IP:3000 | grep -E '^(2|3)[0-9]{2}$'; then "
-                                f"    echo 'Application is ready.'; "
-                                f"    exit 0; "
-                                f"  else "
-                                f"    echo 'Application not ready, waiting...'; "
-                                f"    sleep 5; "
+                                f"  CURL_EXIT_CODE=$?;" # <-- curlの終了コードを$?で取得
+                                f"  if [ \"$CURL_EXIT_CODE\" -ne 0 ]; then"
+                                f"    echo 'curl failed with exit code '$CURL_EXIT_CODE', waiting...';"
+                                f"    sleep 5;"
+                                f"  else"
+                                f"    if [ \"$STATUS_CODE\" -ge 200 ] && [ \"$STATUS_CODE\" -lt 400 ]; then "
+                                f"      echo 'Application is ready.'; "
+                                f"      exit 0; "
+                                f"    else "
+                                f"      echo 'Application returned status code '$STATUS_CODE', waiting...'; "
+                                f"      sleep 5; "
+                                f"    fi; "
                                 f"  fi; "
                                 f"done; "
-    
                                 f"echo 'Application not ready within timeout.'; "
                                 f"exit 1;"
                             ]
