@@ -1,0 +1,196 @@
+/* 基本設定 */
+body {
+    background-color: #000;
+    color: #fff;
+    font-family: 'DotGothic16', sans-serif;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.container {
+    text-align: center;
+    width: 100%;
+    max-width: 600px;
+    padding-bottom: 80px;
+    position: relative;
+}
+
+/* メダルセクション */
+.medal-section {
+    margin-bottom: 20px;
+}
+
+.medal-image.large-medal {
+    width: 800px;
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
+    box-shadow: 0 0 25px rgba(0, 255, 0, 0.7);
+    margin-top: 0;
+}
+
+/* テキストスタイル */
+h1, h2 {
+    font-size: 1.5rem;
+    font-weight: 500;
+    margin-top: 30px;
+    margin-bottom: 10px;
+}
+
+h1 {
+    color: #00ff00;
+}
+
+h3 {
+    font-size: 1.2rem;
+    font-weight: 500;
+    margin-top: 30px;
+    margin-bottom: 10px;
+    cursor: pointer;
+}
+
+p {
+    font-size: 1rem;
+    line-height: 1.6;
+    margin-bottom: 5px;
+}
+
+.specs-list {
+    margin-top: 10px;
+    text-align: left;
+}
+
+.specs-list ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.specs-list li {
+    font-size: 0.9rem;
+    margin-bottom: 5px;
+    color: #ccc;
+}
+
+.specs-list.hidden {
+    display: none;
+}
+
+/* シェアセクション */
+.share-section {
+    margin-top: 40px;
+}
+
+.share-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    color: #fff;
+    font-weight: 600;
+    padding: 12px 25px;
+    border-radius: 50px;
+    transition: background-color 0.3s ease;
+    border: 2px solid #fff;
+}
+
+.x-button {
+    background-color: #000;
+    border: 2px solid #fff;
+}
+
+.x-logo {
+    width: 24px;
+    height: 24px;
+    margin-right: 10px;
+}
+
+.x-button:hover {
+    background-color: #333;
+}
+
+.screenshot-hint {
+    font-size: 0.9rem;
+    margin-top: 15px;
+    color: #ccc;
+}
+
+/* フッター */
+footer {
+    font-size: 0.8rem;
+    color: #888;
+    position: absolute;
+    right: 20px;
+    bottom: 20px;
+    width: auto;
+    display: flex;
+    align-items: center;
+}
+
+footer p {
+    margin: 0;
+    margin-right: 10px;
+}
+
+.team-logo.footer-logo {
+    width: 50px;
+    height: auto;
+}
+
+/* アニメーション */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+    animation: fadeIn 0.8s ease-out forwards;
+}
+.fade-in-delay {
+    animation: fadeIn 0.8s ease-out 0.5s forwards;
+    opacity: 0;
+}
+.fade-in-delay-2 {
+    animation: fadeIn 0.8s ease-out 1s forwards;
+    opacity: 0;
+}
+.fade-in-delay-3 {
+    animation: fadeIn 0.8s ease-out 1.5s forwards;
+    opacity: 0;
+}
+
+/* レスポンシブデザインの調整 */
+@media (max-width: 768px) {
+    /* フォントサイズを相対的に調整 */
+    h1, h2 {
+        font-size: 1.2rem;
+    }
+    h3 {
+        font-size: 1rem;
+    }
+    p, li, footer {
+        font-size: 0.8rem;
+    }
+
+    .medal-image.large-medal {
+        width: 100%;
+    }
+    .team-logo.footer-logo {
+        width: 40px;
+    }
+    body {
+        padding: 10px;
+    }
+    .container {
+        padding-bottom: 60px;
+    }
+    footer {
+        right: 10px;
+        bottom: 10px;
+    }
+}
