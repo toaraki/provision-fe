@@ -7,55 +7,34 @@
     <h1>VM デプロイ状況</h1>
     <div id="status-message">処理中です...</div>
     <pre id="logs-container"></pre>
-    <div id="result"></div>
 
     <script>
         const jobName = "{{ job_name }}";
         const statusMessage = document.getElementById('status-message');
         const logsContainer = document.getElementById('logs-container');
-        const resultDiv = document.getElementById('result');
-        let jobStatusChecked = false;
+        let pollingInterval;
 
-        function checkJobCompletion() {
-            fetch(`/api/job-status/${jobName}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === 'succeeded') {
-                        statusMessage.textContent = '完了しました！';
-                        resultDiv.innerHTML = `<p>VMは <a href="${data.url}" target="_blank">${data.url}</a> にて起動しています。</p>`;
-                    } else if (data.status === 'failed' || data.status === 'error') {
-                        statusMessage.textContent = 'デプロイに失敗しました。';
-                        resultDiv.textContent = `エラー: ${data.message}`;
-                    } else {
-                        // Jobが完了していない場合、完了をチェックし続ける
-                        setTimeout(checkJobCompletion, 5000);
+        function checkStatus() {
+            fetch(`/api/job-logs/${jobName}`)
+                .then(response => response.text())
+                .then(logs => {
+                    logsContainer.textContent = logs;
+                    // Jobが完了したらポーリングを停止
+                    if (logs.includes('VM is ready') || logs.includes('VM network not available')) {
+                        clearInterval(pollingInterval);
                     }
                 })
                 .catch(error => {
-                    console.error('Error checking status:', error);
+                    console.error('Error:', error);
+                    statusMessage.textContent = 'エラーが発生しました。';
+                    clearInterval(pollingInterval);
                 });
         }
 
-        function streamLogs() {
-            const eventSource = new EventSource(`/api/job-logs/${jobName}`);
-            eventSource.onmessage = function(event) {
-                const line = event.data;
-                logsContainer.textContent += line + '\n';
-                logsContainer.scrollTop = logsContainer.scrollHeight;
-            };
-
-            eventSource.onerror = function(error) {
-                console.error('EventSource failed:', error);
-                eventSource.close();
-                // ログストリームが終了したら、ジョブの最終状態をチェックする
-                if (!jobStatusChecked) {
-                    checkJobCompletion();
-                    jobStatusChecked = true;
-                }
-            };
-        }
-
-        window.onload = streamLogs;
+        window.onload = function() {
+            // ログのポーリングを開始
+            pollingInterval = setInterval(checkStatus, 5000);
+        };
     </script>
 </body>
 </html>
