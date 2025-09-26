@@ -170,26 +170,27 @@ def get_job_logs(job_name):
     }
 
     try:
-        # まず、JobのPod名を取得
-        pod_name = f"{job_name}-pod" 
+        # JobのPod名を取得
+        pod_names_url = f"{OPENSHIFT_API_URL}/api/v1/namespaces/{NAMESPACE}/pods?labelSelector=job-name%3D{job_name}"
+        pod_response = requests.get(pod_names_url, headers=headers, verify=False)
+        pod_items = pod_response.json().get('items', [])
         
-        # Podのログを取得するAPI URLを構築
+        if not pod_items:
+            # Podがまだ見つからない場合
+            return jsonify({"status": "error", "message": "Pod not available yet."})
+
+        # Podのログを取得
+        pod_name = pod_items[0]['metadata']['name']
         logs_url = f"{OPENSHIFT_API_URL}/api/v1/namespaces/{NAMESPACE}/pods/{pod_name}/log"
         
-        # ログをストリーミングで取得する
-        response = requests.get(logs_url, headers=headers, stream=True, verify=False)
+        logs_response = requests.get(logs_url, headers=headers, verify=False)
         
-        if response.status_code == 200:
-            def generate_logs():
-                for line in response.iter_lines():
-                    yield f"data: {line.decode('utf-8')}\n\n"
-            
-            return Response(generate_logs(), mimetype="text/event-stream")
+        if logs_response.status_code == 200:
+            return Response(logs_response.text, mimetype="text/plain")
         else:
             return jsonify({"status": "error", "message": "Log stream not available."})
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)})
-        
 
 
 if __name__ == '__main__':

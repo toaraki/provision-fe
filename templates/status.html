@@ -7,33 +7,60 @@
     <h1>VM デプロイ状況</h1>
     <div id="status-message">処理中です...</div>
     <pre id="logs-container"></pre>
+    <div id="result"></div>
 
     <script>
         const jobName = "{{ job_name }}";
         const statusMessage = document.getElementById('status-message');
         const logsContainer = document.getElementById('logs-container');
+        const resultDiv = document.getElementById('result');
         let pollingInterval;
 
-        function checkStatus() {
+        // Jobの完了状態をチェックし、最終結果を表示する
+        function checkJobCompletion() {
+            fetch(`/api/job-status/${jobName}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'succeeded') {
+                        statusMessage.textContent = '完了しました！';
+                        resultDiv.innerHTML = `<p>VMは <a href="${data.url}" target="_blank">${data.url}</a> にて起動しています。</p>`;
+                    } else if (data.status === 'failed' || data.status === 'error') {
+                        statusMessage.textContent = 'デプロイに失敗しました。';
+                        resultDiv.textContent = `エラー: ${data.message}`;
+                    } else {
+                        // Jobがまだ完了していない場合、ポーリングを継続
+                        setTimeout(checkJobCompletion, 5000);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error checking status:', error);
+                });
+        }
+
+        // Jobのログをポーリングしてリアルタイムに表示
+        function pollLogs() {
             fetch(`/api/job-logs/${jobName}`)
                 .then(response => response.text())
                 .then(logs => {
                     logsContainer.textContent = logs;
-                    // Jobが完了したらポーリングを停止
+                    logsContainer.scrollTop = logsContainer.scrollHeight;
+
+                    // ログに完了を示すキーワードが含まれていればポーリングを停止し、最終状態をチェック
                     if (logs.includes('VM is ready') || logs.includes('VM network not available')) {
                         clearInterval(pollingInterval);
+                        checkJobCompletion();
                     }
                 })
                 .catch(error => {
-                    console.error('Error:', error);
-                    statusMessage.textContent = 'エラーが発生しました。';
+                    console.error('Error fetching logs:', error);
                     clearInterval(pollingInterval);
+                    checkJobCompletion();
                 });
         }
 
         window.onload = function() {
-            // ログのポーリングを開始
-            pollingInterval = setInterval(checkStatus, 5000);
+            // ページ読み込み後、すぐにログのポーリングを開始
+            pollingInterval = setInterval(pollLogs, 5000);
         };
     </script>
 </body>
