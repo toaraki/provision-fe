@@ -73,7 +73,7 @@ def deploy():
                                 f"if [ -z '$VM_IP' ]; then echo 'VM IP address not found within timeout.'; exit 1; fi; "
                                 f"echo 'Waiting for application to be ready...'; "
                                 
-                                f"for i in {{1..20}}; do "
+                                f"for i in {{1..30}}; do "
                                 f"  STATUS_CODE=$(curl -s -o /dev/null -w '%{{http_code}}' --max-time 10 http://$VM_IP:3000 || true); "
                                 f"  if [ \"$STATUS_CODE\" -ge 200 ] && [ \"$STATUS_CODE\" -lt 400 ]; then "
                                 f"    echo 'Application is ready.'; "
@@ -81,7 +81,6 @@ def deploy():
                                 f"      ROUTER_URL=$(oc get route {normalized_hostname} -o jsonpath='{{.spec.host}}'); "
                                 f"      echo 'Creating ConfigMap with VM URL...'; "
                                 f"      oc create configmap {job_name}-url --from-literal=url=https://$ROUTER_URL; "
-                                f"      echo 'VM_URL=https://$ROUTER_URL'; "
                                 f"    exit 0; "
                                 f"  else "
                                 f"    echo 'Application not ready, waiting...'; "
