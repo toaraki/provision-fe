@@ -58,7 +58,7 @@ def deploy():
                                 f"VM_NAME='{normalized_hostname}'; "
                                 f"TEMPLATE_URL='https://raw.githubusercontent.com/toaraki/vm-templates/main/vm-fedora-template.yaml'; "
                                 f"echo 'Deploying VM...'; "
-                                f"curl -s -k -L $TEMPLATE_URL | sed 's/{{{{ .hostname }}}}/{normalized_hostname}/g' | sed "s/{{{{ .password }}}}/{guestpassword}/g" | oc apply -f -; "
+                                f"curl -s -k -L $TEMPLATE_URL | sed 's/{{{{ .hostname }}}}/{normalized_hostname}/g' | sed 's/{{{{ .password }}}}/{guestpassword}/g' | oc apply -f -; "
                                 f"echo 'Waiting for VM to be ready...'; "
                                 f"oc wait --for=condition=ready --timeout=300s vm/$VM_NAME; "
                                 f"echo 'Getting VM IP address...'; "
