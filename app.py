@@ -29,6 +29,8 @@ def deploy():
     
     # ホスト名をKubernetesの命名規則に準拠させる
     normalized_hostname = re.sub(r'[^a-z0-9-]', '-', hostname.lower())
+    guestpassword = ''.join(secrets.choice(alphabet) for i in range(8))
+
     # Jobを追跡するための一意な名前を生成
     job_name = f"vm-deployer-{normalized_hostname}-{os.urandom(4).hex()}"
     
@@ -56,7 +58,7 @@ def deploy():
                                 f"VM_NAME='{normalized_hostname}'; "
                                 f"TEMPLATE_URL='https://raw.githubusercontent.com/toaraki/vm-templates/main/vm-fedora-template.yaml'; "
                                 f"echo 'Deploying VM...'; "
-                                f"curl -s -k -L $TEMPLATE_URL | sed 's/{{{{ .hostname }}}}/{normalized_hostname}/g' | oc apply -f -; "
+                                f"curl -s -k -L $TEMPLATE_URL | sed 's/{{{{ .hostname }}}}/{normalized_hostname}/g' | sed "s/{{{{ .password }}}}/{guestpassword}/g" | oc apply -f -; "
                                 f"echo 'Waiting for VM to be ready...'; "
                                 f"oc wait --for=condition=ready --timeout=300s vm/$VM_NAME; "
                                 f"echo 'Getting VM IP address...'; "
