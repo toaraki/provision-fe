@@ -32,7 +32,9 @@ def deploy():
     
     # ホスト名をKubernetesの命名規則に準拠させる
     normalized_hostname = re.sub(r'[^a-z0-9-]', '-', hostname.lower())
+    alphabet = string.ascii_letters + string.digits
     guestpassword = ''.join(secrets.choice(alphabet) for i in range(8))
+
 
     # Jobを追跡するための一意な名前を生成
     job_name = f"vm-deployer-{normalized_hostname}-{os.urandom(4).hex()}"
