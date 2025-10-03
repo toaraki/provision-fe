@@ -9,7 +9,7 @@
 <body>
     <div class="container">
         <div class="header-logo">
-            <img src="{{ url_for('static', filename='images/header-logo.png') }}" alt="RHSC2025 Tokyo Virtual Machine Deployment">
+            <img src="{{ url_for('static', filename='images/header-logo.avif') }}" alt="RHSC2025 Tokyo Virtual Machine Deployment">
         </div>
 
         <p>仮想マシンに設定するホスト名を教えて！<br>おすすめは、あなたのお名前のアルファベット表記です！！</p>
@@ -34,7 +34,7 @@
 
 <div class="examples-container">
     <div class="example-block ok-example">
-        <h3>OKな例:</h3>
+        <img src="{{ url_for('static', filename='images/OK-LOGO.jpg') }}" alt="OKな例" class="example-title-image">
         <ul>
             <li>vm-01</li>
             <li>my-vm-for-app</li>
@@ -44,7 +44,7 @@
     </div>
 
     <div class="example-block ng-example">
-        <h3>NGな例:</h3>
+        <img src="{{ url_for('static', filename='images/NG-LOGO.jpg') }}" alt="NGな例" class="example-title-image">
         <ul>
             <li>MyVM</li>
             <li>vm.test</li>
