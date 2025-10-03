@@ -13,6 +13,14 @@
         </div>
 
         <p>仮想マシンに設定するホスト名を教えて！<br>おすすめは、あなたのお名前のアルファベット表記です！！</p>
+        <div class="rules-section">
+            <h3>ホスト名命名ルール</h3>
+            <ul>
+                <li>利用できる文字: 小文字英数字 (a-z, 0-9) とハイフン (-) のみ</li>
+                <li>文字数: 63文字以内</li>
+                <li>開始と終了: ハイフンで始めたり、終えたりすることはできません</li>
+            </ul>
+        </div>
 
         <form id="deploy-form" action="{{ url_for('deploy') }}" method="post">
             <label for="hostname">ホスト名：</label>
@@ -23,35 +31,30 @@
             </button>
         </form>
 
-        <div class="rules-section">
-            <h3>ホスト名命名ルール</h3>
-            <ul>
-                <li>利用できる文字: 小文字英数字 (a-z, 0-9) とハイフン (-) のみ</li>
-                <li>文字数: 63文字以内</li>
-                <li>開始と終了: ハイフンで始めたり、終えたりすることはできません</li>
-            </ul>
-        </div>
 
-        <div class="examples-section">
-            <div class="ok-examples">
-                <h4>OK例:</h4>
-                <ul>
-                    <li>vm-01</li>
-                    <li>my-vm-for-app</li>
-                    <li>user123-vm-01</li>
-                </ul>
-            </div>
-            <div class="ng-examples">
-                <h4>NG例:</h4>
-                <ul>
-                    <li>MyVM</li>
-                    <li>vm.test</li>
-                    <li>vm_01</li>
-                    <li>vm--01</li>
-                    <li>my-vm-is-too-long-to-fit-in-the-field-and-it-will-not-work-anymore</li>
-                </ul>
-            </div>
-        </div>
+<div class="examples-container">
+    <div class="example-block ok-example">
+        <h3>OKな例:</h3>
+        <ul>
+            <li>vm-01</li>
+            <li>my-vm-for-app</li>
+            <li>user123-vm-01</li>
+            <li>oreno-host</li>
+        </ul>
+    </div>
+
+    <div class="example-block ng-example">
+        <h3>NGな例:</h3>
+        <ul>
+            <li>MyVM</li>
+            <li>vm.test</li>
+            <li>vm_01</li>
+            <li>vm--01</li>
+            <li>my-vm-is-too-long-to-fit-in-the-field-and-it-will-not-work-anymore</li>
+        </ul>
+    </div>
+</div>
+
     </div>
     <script>
         const hostnameInput = document.getElementById('hostname');

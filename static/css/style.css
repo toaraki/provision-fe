@@ -241,3 +241,38 @@ button[type="submit"] {
     height: auto;
     display: block;
 }
+
+.rules-container {
+    border: 2px solid #fff; /* 白い枠線 */
+    border-radius: 10px; /* 角を丸くする */
+    padding: 15px; /* 内側の余白 */
+    margin-top: 20px; /* 上に余白 */
+    background-color: rgba(255, 255, 255, 0.1); /* 半透明の背景 */
+}
+
+/* OK例とNG例のコンテナ */
+.examples-container {
+    display: flex; /* これが横並びの鍵です */
+    justify-content: space-between; /* 要素間に均等なスペースを空ける */
+    gap: 20px; /* 要素間の余白 */
+    flex-wrap: wrap; /* 画面が狭いときに要素を折り返す */
+    margin-top: 20px;
+}
+
+/* 個々のOK/NG例ブロック */
+.example-block {
+    flex: 1; /* 親コンテナ内で均等な幅を占める */
+    border: 2px solid #fff;
+    border-radius: 10px;
+    padding: 15px;
+    background-color: rgba(255, 255, 255, 0.1);
+    box-sizing: border-box; /* パディングとボーダーを幅に含める */
+}
+
+/* スマホでは縦並びにするためのメディアクエリ */
+@media screen and (max-width: 768px) {
+    .examples-container {
+        flex-direction: column; /* 縦並びに変更 */
+        gap: 10px; /* 余白を調整 */
+    }
+}
