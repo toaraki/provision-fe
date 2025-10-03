@@ -31,6 +31,14 @@ def index():
 def deploy():
     hostname = request.form['hostname']
     
+    # サーバーサイドでのホスト名検証
+    # RFC 1123 DNS ラベルのルールに準拠しているか確認
+    # 小文字の英数字とハイフンのみ、先頭と末尾は英数字
+    if not re.match(r'^[a-z0-9]([-a-z0-9]*[a-z0-9])?$', hostname):
+        # ホスト名が無効な場合
+        flash('無効なホスト名です。英数字とハイフンのみ使用可能で、ハイフンで始まり/終わることはできません。', 'error')
+        return redirect(url_for('index'))
+    
     # ホスト名をKubernetesの命名規則に準拠させる
     normalized_hostname = re.sub(r'[^a-z0-9-]', '-', hostname.lower())
     alphabet = string.ascii_letters + string.digits

@@ -11,17 +11,49 @@
         label { margin-bottom: 5px; }
         input { padding: 8px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px; }
         button { padding: 10px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        .error-message { color: red; font-size: 0.9em; display: none; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>VM デプロイ</h1>
         <p>VMのホスト名を入力してください。</p>
-        <form action="{{ url_for('deploy') }}" method="post">
+        <form id="deploy-form" action="{{ url_for('deploy') }}" method="post">
             <label for="hostname">ホスト名：</label>
             <input type="text" id="hostname" name="hostname" placeholder="例: my-fedora-vm" required>
+            <p id="error-message" class="error-message">無効なホスト名です。英数字とハイフンのみ使用可能で、ハイフンで始まり/終わることはできません。</p>
             <button type="submit">デプロイ</button>
         </form>
     </div>
+
+    <script>
+        const hostnameInput = document.getElementById('hostname');
+        const errorMessage = document.getElementById('error-message');
+        const deployForm = document.getElementById('deploy-form');
+
+        hostnameInput.addEventListener('input', function() {
+            // 正規表現で有効なホスト名かチェック
+            // RFC 1123 DNS ラベルの命名規則
+            const isValid = /^[a-z0-9]([-a-z0-9]*[a-z0-9])?$/.test(this.value);
+            
+            if (isValid || this.value === '') {
+                // 有効な場合はエラーメッセージを非表示にする
+                errorMessage.style.display = 'none';
+            } else {
+                // 無効な場合はエラーメッセージを表示する
+                errorMessage.style.display = 'block';
+            }
+        });
+
+        deployForm.addEventListener('submit', function(event) {
+            // フォーム送信時にも最終チェック
+            const isValid = /^[a-z0-9]([-a-z0-9]*[a-z0-9])?$/.test(hostnameInput.value);
+            if (!isValid) {
+                // 無効な場合は送信をキャンセル
+                event.preventDefault();
+                errorMessage.style.display = 'block';
+            }
+        });
+    </script>
 </body>
 </html>
