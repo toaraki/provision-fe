@@ -41,10 +41,9 @@ body {
 }
 
 .container {
-    text-align: center;
     width: 100%;
     max-width: 600px;
-    padding-bottom: 80px;
+    padding-bottom: 40px;
     position: relative;
 }
 
@@ -245,8 +244,8 @@ button[type="submit"] {
 .rules-container {
     border: 2px solid #fff; /* 白い枠線 */
     border-radius: 10px; /* 角を丸くする */
-    padding: 15px; /* 内側の余白 */
-    margin-top: 20px; /* 上に余白 */
+    padding: 8px 15px; /* 内側の余白 */
+    margin-top: 10px; /* 上に余白 */
     background-color: rgba(255, 255, 255, 0.1); /* 半透明の背景 */
 }
 
@@ -256,7 +255,7 @@ button[type="submit"] {
     justify-content: space-between; /* 要素間に均等なスペースを空ける */
     gap: 20px; /* 要素間の余白 */
     flex-wrap: wrap; /* 画面が狭いときに要素を折り返す */
-    margin-top: 20px;
+    margin-top: 10px;
 }
 
 /* 個々のOK/NG例ブロック */
@@ -264,7 +263,7 @@ button[type="submit"] {
     flex: 1; /* 親コンテナ内で均等な幅を占める */
     border: 2px solid #fff;
     border-radius: 10px;
-    padding: 15px;
+    padding: 8px 15px;
     background-color: rgba(255, 255, 255, 0.1);
     box-sizing: border-box; /* パディングとボーダーを幅に含める */
 }
