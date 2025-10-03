@@ -19,6 +19,20 @@ body {
     background-position: center center;
 }
 
+/* ヘッダーロゴのスタイル */
+.header-logo {
+    text-align: center; /* 画像を中央揃えにする */
+    margin-bottom: 20px; /* 下に余白を作る */
+    width: 100%; /* 親要素の幅いっぱいに広げる */
+}
+
+.header-logo img {
+    max-width: 100%; /* 親要素の幅を超えないようにする */
+    height: auto; /* 縦横比を維持 */
+    display: block; /* 余分な下部スペースを削除 */
+    margin: 0 auto; /* 中央揃え（テキストアラインセンターと合わせて） */
+}
+
 /* Optional: If you have a separate mobile image, keep the media query */
 @media screen and (max-width: 768px) {
     body {

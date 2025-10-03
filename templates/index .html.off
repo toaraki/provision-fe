@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<!--
+<head>
+    <meta charset="UTF-8">
+    <title>VM デプロイ</title>
+    <style>
+        body { font-family: sans-serif; margin: 40px; }
+        h1 { color: #333; }
+        .container { max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ccc; border-radius: 8px; }
+        form { display: flex; flex-direction: column; }
+        label { margin-bottom: 5px; }
+        input { padding: 8px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px; }
+        button { padding: 10px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        .error-message { color: red; font-size: 0.9em; display: none; }
+    </style>
+</head>
+-->
+
+<head>
+    <meta charset="UTF-8">
+    <title>VM デプロイ</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+    <div class="container">
+        <h1>RHSC2025 Tokyo で記念の仮想マシンをデプロイしよう！</h1>
+        <p>仮想マシンに設定するホスト名を教えて！ おすすめは、あなたのお名前のアルファベット表記です！！
+        <form id="deploy-form" action="{{ url_for('deploy') }}" method="post">
+            <label for="hostname">ホスト名：</label>
+            <input type="text" id="hostname" name="hostname" placeholder="例: my-fedora-vm" required>
+            <p id="error-message" class="error-message">無効なホスト名です。ホスト名命名ルールを確認してください！</p>
+            <button type="submit">デプロイ</button>
+        </form>
+        <p>注意：ホスト名命名ルール
+            <ul>
+                <li>利用できる文字: 小文字英数字（a-z, 0-9）とハイフン（-）のみ</li>
+                <li>文字数: 63文字以内</li>
+                <li>開始と終了: ハイフンで始めたり、終えたりすることはできません</li>
+            </ul>
+        </p>
+        <p>OKな例:vm-01, my-vm-for-app, user123-vm-01</p>
+        <p>NGな例:MyVM, vm.test, vm_01, vm--01, my-vm-is-too-long-to-fit-in-the-field-and-it-will-not-work-anymore</p>
+    </div>
+
+    <script>
+        const hostnameInput = document.getElementById('hostname');
+        const errorMessage = document.getElementById('error-message');
+        const deployForm = document.getElementById('deploy-form');
+
+        hostnameInput.addEventListener('input', function() {
+            const value = this.value;
+            // ホスト名命名規則 (英数字, ハイフンのみ, ハイフンで開始/終了しない)
+            const isValidChars = /^[a-z0-9]([-a-z0-9]*[a-z0-9])?$/.test(value);
+            // 文字数制限のチェック (最大63文字)
+            const isValidLength = value.length <= 63;
+            
+            // 両方の条件を満たしているか、または空欄の場合
+            if ((isValidChars && isValidLength) || value === '') {
+                errorMessage.style.display = 'none';
+            } else {
+                errorMessage.style.display = 'block';
+            }
+        });
+
+        deployForm.addEventListener('submit', function(event) {
+            const value = hostnameInput.value;
+            const isValidChars = /^[a-z0-9]([-a-z0-9]*[a-z0-9])?$/.test(value);
+            const isValidLength = value.length <= 63;
+
+            if (!isValidChars || !isValidLength) {
+                event.preventDefault();
+                errorMessage.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>
