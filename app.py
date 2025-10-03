@@ -16,15 +16,16 @@ NAMESPACE = os.environ.get('NAMESPACE')
 
 @app.route('/', methods=['GET'])
 def index():
-    return """
-    <h1>VM デプロイ</h1>
-    <p>VMのホスト名を入力してください。</p>
-    <form action="/deploy" method="post">
-        <label for="hostname">ホスト名：</label>
-        <input type="text" id="hostname" name="hostname" placeholder="例: my-fedora-vm" required>
-        <button type="submit">デプロイ</button>
-    </form>
-    """
+##    return """
+##    <h1>VM デプロイ</h1>
+##    <p>VMのホスト名を入力してください。</p>
+##    <form action="/deploy" method="post">
+##        <label for="hostname">ホスト名：</label>
+##        <input type="text" id="hostname" name="hostname" placeholder="例: my-fedora-vm" required>
+##        <button type="submit">デプロイ</button>
+##    </form>
+##    """
+      return render_template('index.html')
 
 @app.route('/deploy', methods=['POST'])
 def deploy():
