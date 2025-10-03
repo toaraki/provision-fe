@@ -10,8 +10,20 @@ body {
     min-height: 100vh;
     padding: 20px;
     box-sizing: border-box;
+
+    /* PC用の背景画像ルール */
+    background-image: url('../images/PC-BackGound.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center center;
 }
 
+/* 768px以下の画面幅に適用されるスマホ用のルール */
+@media screen and (max-width: 768px) {
+    body {
+        background-image: url('../images/sp-background.png');
+    }
+}
 .container {
     text-align: center;
     width: 100%;

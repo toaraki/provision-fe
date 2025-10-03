@@ -1,5 +1,7 @@
 <!DOCTYPE html>
 <html lang="ja">
+
+<!--
 <head>
     <meta charset="UTF-8">
     <title>VM デプロイ</title>
@@ -14,16 +16,33 @@
         .error-message { color: red; font-size: 0.9em; display: none; }
     </style>
 </head>
+-->
+
+<head>
+    <meta charset="UTF-8">
+    <title>VM デプロイ</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
 <body>
     <div class="container">
-        <h1>VM デプロイ</h1>
-        <p>VMのホスト名を入力してください。</p>
+        <h1>RHSC2025 Tokyo で記念の仮想マシンをデプロイしよう！</h1>
+        <p>仮想マシンに設定するホスト名を教えて！ おすすめは、あなたのお名前のアルファベット表記です！！
         <form id="deploy-form" action="{{ url_for('deploy') }}" method="post">
             <label for="hostname">ホスト名：</label>
             <input type="text" id="hostname" name="hostname" placeholder="例: my-fedora-vm" required>
-            <p id="error-message" class="error-message">無効なホスト名です。英数字とハイフンのみ使用可能で、ハイフンで始まり/終わることはできません。</p>
+            <p id="error-message" class="error-message">無効なホスト名です。ホスト名命名ルールを確認してください！</p>
             <button type="submit">デプロイ</button>
         </form>
+        <p>注意：ホスト名命名ルール
+            <ul>
+                <li>利用できる文字: 小文字英数字（a-z, 0-9）とハイフン（-）のみ</li>
+                <li>文字数: 63文字以内</li>
+                <li>開始と終了: ハイフンで始めたり、終えたりすることはできません</li>
+            </ul>
+        </p>
+        <p>OKな例:vm-01, my-vm-for-app, user123-vm-01</p>
+        <p>NGな例:MyVM, vm.test, vm_01, vm--01, my-vm-is-too-long-to-fit-in-the-field-and-it-will-not-work-anymore</p>
     </div>
 
     <script>
@@ -32,24 +51,26 @@
         const deployForm = document.getElementById('deploy-form');
 
         hostnameInput.addEventListener('input', function() {
-            // 正規表現で有効なホスト名かチェック
-            // RFC 1123 DNS ラベルの命名規則
-            const isValid = /^[a-z0-9]([-a-z0-9]*[a-z0-9])?$/.test(this.value);
+            const value = this.value;
+            // ホスト名命名規則 (英数字, ハイフンのみ, ハイフンで開始/終了しない)
+            const isValidChars = /^[a-z0-9]([-a-z0-9]*[a-z0-9])?$/.test(value);
+            // 文字数制限のチェック (最大63文字)
+            const isValidLength = value.length <= 63;
             
-            if (isValid || this.value === '') {
-                // 有効な場合はエラーメッセージを非表示にする
+            // 両方の条件を満たしているか、または空欄の場合
+            if ((isValidChars && isValidLength) || value === '') {
                 errorMessage.style.display = 'none';
             } else {
-                // 無効な場合はエラーメッセージを表示する
                 errorMessage.style.display = 'block';
             }
         });
 
         deployForm.addEventListener('submit', function(event) {
-            // フォーム送信時にも最終チェック
-            const isValid = /^[a-z0-9]([-a-z0-9]*[a-z0-9])?$/.test(hostnameInput.value);
-            if (!isValid) {
-                // 無効な場合は送信をキャンセル
+            const value = hostnameInput.value;
+            const isValidChars = /^[a-z0-9]([-a-z0-9]*[a-z0-9])?$/.test(value);
+            const isValidLength = value.length <= 63;
+
+            if (!isValidChars || !isValidLength) {
                 event.preventDefault();
                 errorMessage.style.display = 'block';
             }
