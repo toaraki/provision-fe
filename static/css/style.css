@@ -12,7 +12,7 @@ body {
     box-sizing: border-box;
 
     /* PC用の背景画像ルール */
-    background-image: url('../images/PC-BackGound.png');
+    background-image: url('../images/PC-BackGound.jpg');
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center center;
@@ -21,7 +21,7 @@ body {
 /* 768px以下の画面幅に適用されるスマホ用のルール */
 @media screen and (max-width: 768px) {
     body {
-        background-image: url('../images/sp-background.png');
+        background-image: url('../images/sp-background.jpg');
     }
 }
 .container {
