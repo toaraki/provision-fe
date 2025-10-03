@@ -278,8 +278,21 @@ button[type="submit"] {
 
 /* 例のタイトル画像のスタイル */
 .example-title-image {
-    max-width: 100px; /* 画像の最大幅を制限 */
+    max-width: 50px; /* 画像の最大幅を制限 */
     height: auto;
     display: block; /* 画像の下にできる余白を削除 */
-    margin: 0 auto 10px; /* 上下に余白を追加し、中央に配置 */
+    margin: 0 0 10px 0; /* 上下0, 左右0, 下10px */
 }
+
+input[type="text"] {
+    padding: 12px; /* パディングを増やして高さを確保 */
+    margin-top: 15px; /* 下の余白を少し増やす */
+    margin-bottom: 15px; /* 下の余白を少し増やす */
+    height: 40px; /* フィールドの高さを指定 */
+    font-size: 1.2em; /* フォントサイズを大きくする */
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 100%; /* 親要素の幅いっぱいに広げる */
+    box-sizing: border-box; /* パディングとボーダーを幅に含める */
+}
+
