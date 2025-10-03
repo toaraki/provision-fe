@@ -16,7 +16,7 @@
         <div class="rules-container ">
             <h3>ホスト名命名ルール</h3>
             <ul>
-                <li>利用できる文字: 小文字英数字 (a-z, 0-9) とハイフン (-) のみ</li>
+                <li>利用できる文字: 小文字英数字 (a-z, 0-9) とハイフン (-) のみ. 数字始まりは不可</li>
                 <li>文字数: 63文字以内</li>
                 <li>開始と終了: ハイフンで始めたり、終えたりすることはできません</li>
             </ul>
@@ -66,7 +66,7 @@
             // ページ読み込み時にエラーメッセージを非表示にする
             document.getElementById('error-message').style.display = 'none';
         };
-        
+
         hostnameInput.addEventListener('input', function() {
             const value = this.value;
             // ホスト名命名規則 (英数字, ハイフンのみ, ハイフンで開始/終了しない)
@@ -84,7 +84,8 @@
 
         deployForm.addEventListener('submit', function(event) {
             const value = hostnameInput.value;
-            const isValidChars = /^[a-z0-9]([-a-z0-9]*[a-z0-9])?$/.test(value);
+            //const isValidChars = /^[a-z0-9]([-a-z0-9]*[a-z0-9])?$/.test(value);
+            const isValidChars = /^[a-z]([-a-z0-9]*[a-z0-9])?$/.test(value);
             const isValidLength = value.length <= 63;
 
             if (!isValidChars || !isValidLength) {
