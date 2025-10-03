@@ -71,7 +71,7 @@ h1, h2 {
 }
 
 h1 {
-    color: #00ff00;
+    color: #ffffff;
 }
 
 h3 {
@@ -313,4 +313,18 @@ input[type="text"] {
     overflow-y: auto; /* 縦スクロールを有効化 */
     white-space: pre-wrap; /* 自動改行を有効化 */
     word-break: break-all; /* 単語の途中でも改行可能にする */
+
+    /* ログ専用のフォントに変更 */
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    line-height: 1.4;
+    color: #00ff00;
+}
+
+/* 処理結果コンテナのスタイル */
+.result-container {
+    background-color: rgba(0, 0, 0, 0.5); /* 半透明の黒 */
+    padding: 15px; /* 内側の余白 */
+    border-radius: 10px; /* 角を丸くする */
+    margin-top: 20px; /* 上の余白 */
 }
