@@ -12,16 +12,15 @@
             <img src="{{ url_for('static', filename='images/header-logo.jpg') }}" alt="RHSC2025 Tokyo Virtual Machine Deployment">
         </div>
 
-        <h1>RHSC2025 Tokyo 企画</h1>
-        <p class="subtitle">来場記念 : 仮想マシン・デプロイ！</p>
-        
         <p>仮想マシンに設定するホスト名を教えて！<br>おすすめは、あなたのお名前のアルファベット表記です！！</p>
 
         <form id="deploy-form" action="{{ url_for('deploy') }}" method="post">
             <label for="hostname">ホスト名：</label>
             <input type="text" id="hostname" name="hostname" placeholder="例: my-fedora-vm" required>
             <p id="error-message" class="error-message">無効なホスト名です。英数字とハイフンのみ使用可能で、ハイフンで始まり/終わることはできません。</p>
-            <button type="submit">デプロイ</button>
+            <button type="submit">
+                <img src="{{ url_for('static', filename='images/push-button.avif') }}" alt="デプロイ" class="deploy-button-image">
+            </button>
         </form>
 
         <div class="rules-section">
@@ -55,7 +54,35 @@
         </div>
     </div>
     <script>
-        // ... (既存のJavaScriptコードをここに配置)
+        const hostnameInput = document.getElementById('hostname');
+        const errorMessage = document.getElementById('error-message');
+        const deployForm = document.getElementById('deploy-form');
+
+        hostnameInput.addEventListener('input', function() {
+            const value = this.value;
+            // ホスト名命名規則 (英数字, ハイフンのみ, ハイフンで開始/終了しない)
+            const isValidChars = /^[a-z0-9]([-a-z0-9]*[a-z0-9])?$/.test(value);
+            // 文字数制限のチェック (最大63文字)
+            const isValidLength = value.length <= 63;
+            
+            // 両方の条件を満たしているか、または空欄の場合
+            if ((isValidChars && isValidLength) || value === '') {
+                errorMessage.style.display = 'none';
+            } else {
+                errorMessage.style.display = 'block';
+            }
+        });
+
+        deployForm.addEventListener('submit', function(event) {
+            const value = hostnameInput.value;
+            const isValidChars = /^[a-z0-9]([-a-z0-9]*[a-z0-9])?$/.test(value);
+            const isValidLength = value.length <= 63;
+
+            if (!isValidChars || !isValidLength) {
+                event.preventDefault();
+                errorMessage.style.display = 'block';
+            }
+        });
     </script>
 </body>
 </html>

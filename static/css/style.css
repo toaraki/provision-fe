@@ -222,3 +222,22 @@ footer p {
         bottom: 10px;
     }
 }
+
+/* 既存のボタンのスタイルを修正 */
+button[type="submit"] {
+    padding: 0; /* 元のパディングを削除 */
+    border: none; /* 元のボーダーを削除 */
+    background-color: transparent; /* 元の背景色を削除 */
+    cursor: pointer;
+    display: block;
+    width: 250px; /* ボタンの幅を固定 */
+    height: auto; /* 高さは自動調整 */
+    margin: 20px auto; /* 中央に配置 */
+}
+
+/* 画像のスタイル */
+.deploy-button-image {
+    width: 100%; /* ボタンの幅いっぱいに広げる */
+    height: auto;
+    display: block;
+}
