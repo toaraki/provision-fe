@@ -13,30 +13,31 @@ body {
     
     /* Responsive Background Image Rules */
     background-image: url('../images/pc-background.jpg');
-    background-size: cover; /* This is the key change */
-    background-attachment: fixed; /* This prevents the image from scrolling with the content */
+    background-size: cover;
+    background-attachment: fixed; /* PCでは固定 */
     background-repeat: no-repeat;
     background-position: center center;
 }
 
 /* ヘッダーロゴのスタイル */
 .header-logo {
-    text-align: center; /* 画像を中央揃えにする */
-    margin-bottom: 20px; /* 下に余白を作る */
-    width: 100%; /* 親要素の幅いっぱいに広げる */
+    text-align: center;
+    margin-bottom: 20px;
+    width: 100%;
 }
 
 .header-logo img {
-    max-width: 100%; /* 親要素の幅を超えないようにする */
-    height: auto; /* 縦横比を維持 */
-    display: block; /* 余分な下部スペースを削除 */
-    margin: 0 auto; /* 中央揃え（テキストアラインセンターと合わせて） */
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
 }
 
-/* Optional: If you have a separate mobile image, keep the media query */
+/* スマホ用のメディアクエリ */
 @media screen and (max-width: 768px) {
     body {
         background-image: url('../images/sp-background.png');
+        background-attachment: scroll; /* この行を追加 */
     }
 }
 

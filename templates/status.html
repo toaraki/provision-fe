@@ -1,10 +1,18 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>VM デプロイ状況</title>
+    <title>仮想マシンを起動中</title>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    
 </head>
 <body>
-    <h1>VM デプロイ状況</h1>
+    <div class="header-logo">
+        <img src="{{ url_for('static', filename='images/header-logo.avif') }}" alt="RHSC2025 Tokyo Virtual Machine Deployment">
+    </div>
+    <h1>仮想マシンを起動中！</h1>
     <div id="status-message">処理中です...</div>
     <pre id="logs-container"></pre>
     <div id="result"></div>

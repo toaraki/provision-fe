@@ -23,6 +23,7 @@
         </div>
 
         <form id="deploy-form" action="{{ url_for('deploy') }}" method="post">
+            <br>
             <label for="hostname">ホスト名：</label>
             <input type="text" id="hostname" name="hostname" placeholder="例: my-fedora-vm" required>
             <p id="error-message" class="error-message">無効なホスト名です。英数字とハイフンのみ使用可能で、ハイフンで始まり/終わることはできません。</p>
@@ -31,7 +32,7 @@
             </button>
         </form>
 
-
+<H3>ホスト名の例</H3>
 <div class="examples-container">
     <div class="example-block ok-example">
         <img src="{{ url_for('static', filename='images/OK-LOGO.jpg') }}" alt="OKな例" class="example-title-image">
