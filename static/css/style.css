@@ -340,7 +340,7 @@ footer p {
 @media screen and (max-width: 768px) {
   /* Body and Layout */
   body {
-    background-image: url('../images/sp-background.png');
+    background-image: url('../images/sp-background.jpg');
     background-attachment: scroll;
     padding: var(--spacing-sm);
   }
