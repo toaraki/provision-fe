@@ -26,7 +26,7 @@
             <br>
             <label for="hostname">ホスト名：</label>
             <input type="text" id="hostname" name="hostname" placeholder="例: my-fedora-vm" required>
-            <p id="error-message" class="error-message">無効なホスト名です。英数字とハイフンのみ使用可能で、ハイフンで始まり/終わることはできません。</p>
+            <p id="error-message" class="error-message" style="display: none;">無効なホスト名です。英数字とハイフンのみ使用可能で、ハイフンで始まり/終わることはできません。</p>
             <button type="submit">
                 <img src="{{ url_for('static', filename='images/push-button.avif') }}" alt="デプロイ" class="deploy-button-image">
             </button>
@@ -62,6 +62,11 @@
         const errorMessage = document.getElementById('error-message');
         const deployForm = document.getElementById('deploy-form');
 
+        window.onload = function() {
+            // ページ読み込み時にエラーメッセージを非表示にする
+            document.getElementById('error-message').style.display = 'none';
+        };
+        
         hostnameInput.addEventListener('input', function() {
             const value = this.value;
             // ホスト名命名規則 (英数字, ハイフンのみ, ハイフンで開始/終了しない)
