@@ -8,14 +8,16 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     
 </head>
-<body>
-    <div class="header-logo">
-        <img src="{{ url_for('static', filename='images/header-logo.avif') }}" alt="RHSC2025 Tokyo Virtual Machine Deployment">
+<body class="status-page">
+    <div class="container">
+        <div class="header-logo">
+            <img src="{{ url_for('static', filename='images/header-logo.avif') }}" alt="RHSC2025 Tokyo Virtual Machine Deployment">
+        </div>
+        <h1>仮想マシンを起動中！</h1>
+        <div id="status-message">処理中です...</div>
+        <pre id="logs-container"></pre>
+        <div id="result"></div>
     </div>
-    <h1>仮想マシンを起動中！</h1>
-    <div id="status-message">処理中です...</div>
-    <pre id="logs-container"></pre>
-    <div id="result"></div>
 
     <script>
         const jobName = "{{ job_name }}";

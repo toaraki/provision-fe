@@ -297,3 +297,20 @@ input[type="text"] {
     box-sizing: border-box; /* パディングとボーダーを幅に含める */
 }
 
+/* statusページのスタイル */
+.status-page .container {
+    max-width: 90%; /* コンテナの最大幅を広くする */
+    width: 90%;
+    /* 必要に応じて、背景色やボーダーを調整 */
+}
+
+/* ログ表示エリアのスタイル */
+#logs-container {
+    background-color: #2c2c2c;
+    border: 1px solid #0f0;
+    padding: 10px;
+    height: 400px; /* 高さを固定してスクロール可能にする */
+    overflow-y: auto; /* 縦スクロールを有効化 */
+    white-space: pre-wrap; /* 自動改行を有効化 */
+    word-break: break-all; /* 単語の途中でも改行可能にする */
+}
