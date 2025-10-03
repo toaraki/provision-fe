@@ -120,16 +120,44 @@ def deploy():
     }
 
     # JobをOpenShift APIに送信し、ステータスページにリダイレクト
+    ##try:
+    ##    api_url = f"{OPENSHIFT_API_URL}/apis/batch/v1/namespaces/{NAMESPACE}/jobs"
+    ##    response = requests.post(api_url, json=job_manifest, headers=headers, verify=False)
+    ##    if response.status_code == 201:
+    ##        return redirect(url_for('status_page', job_name=job_name))
+    ##    else:
+    ##        return f"<h1>デプロイ失敗</h1><p>エラー: {response.text}</p>"
+    ##except Exception as e:
+    ##    return f"<h1>通信エラー</h1><p>エラー: {str(e)}</p>"
     try:
         api_url = f"{OPENSHIFT_API_URL}/apis/batch/v1/namespaces/{NAMESPACE}/jobs"
         response = requests.post(api_url, json=job_manifest, headers=headers, verify=False)
+        
+        # OpenShift APIからのレスポンスを詳細にチェック
         if response.status_code == 201:
+            logging.info(f"Successfully created Job: {job_name}")
             return redirect(url_for('status_page', job_name=job_name))
-        else:
-            return f"<h1>デプロイ失敗</h1><p>エラー: {response.text}</p>"
-    except Exception as e:
-        return f"<h1>通信エラー</h1><p>エラー: {str(e)}</p>"
+        
+        elif response.status_code == 401:
+            logging.error("OpenShift API Unauthorized. Check your TOKEN.")
+            return "<h1>デプロイ失敗</h1><p>エラー: 認証に失敗しました。トークンを確認してください。</p>", 401
 
+        elif response.status_code == 403:
+            logging.error(f"OpenShift API Forbidden. Check ServiceAccount permissions. Response: {response.text}")
+            return "<h1>デプロイ失敗</h1><p>エラー: 権限がありません。サービスアカウントの権限を確認してください。</p>", 403
+
+        else:
+            logging.error(f"Failed to create Job. Status: {response.status_code}, Response: {response.text}")
+            return f"<h1>デプロイ失敗</h1><p>エラー: OpenShift APIから予期せぬエラーが返されました。<br>詳細: {response.text}</p>", response.status_code
+
+    except requests.exceptions.RequestException as e:
+        logging.error(f"Network or API communication error: {str(e)}")
+        return f"<h1>通信エラー</h1><p>エラー: OpenShift APIに接続できません。<br>詳細: {str(e)}</p>", 503 # Service Unavailable
+
+    except Exception as e:
+        # 上記以外の予期せぬエラー
+        logging.exception("An unexpected error occurred during deployment.")
+        return f"<h1>デプロイ処理で予期せぬエラーが発生しました</h1><p>エラー: {str(e)}</p>", 500
 
 
 from flask import jsonify
