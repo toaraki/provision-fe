@@ -16,7 +16,8 @@
         <div class="rules-container ">
             <h3>ホスト名命名ルール</h3>
             <ul>
-                <li>利用できる文字: 小文字英数字 (a-z, 0-9) とハイフン (-) のみ. 数字始まりは不可</li>
+                <li>利用できる文字: 小文字英数字 (a-z, 0-9) とハイフン (-) のみ</li>
+                <li>数字始まりは不可</li>
                 <li>文字数: 63文字以内</li>
                 <li>開始と終了: ハイフンで始めたり、終えたりすることはできません</li>
             </ul>
@@ -49,6 +50,7 @@
         <ul>
             <li>MyVM</li>
             <li>vm.test</li>
+            <li>777vm</li>
             <li>vm_01</li>
             <li>vm--01</li>
             <li>my-vm-is-too-long-to-fit-in-the-field-and-it-will-not-work-anymore</li>
@@ -70,7 +72,8 @@
         hostnameInput.addEventListener('input', function() {
             const value = this.value;
             // ホスト名命名規則 (英数字, ハイフンのみ, ハイフンで開始/終了しない)
-            const isValidChars = /^[a-z0-9]([-a-z0-9]*[a-z0-9])?$/.test(value);
+            // const isValidChars = /^[a-z0-9]([-a-z0-9]*[a-z0-9])?$/.test(value);
+            const isValidChars = /^[a-z]([-a-z0-9]*[a-z0-9])?$/.test(value);
             // 文字数制限のチェック (最大63文字)
             const isValidLength = value.length <= 63;
             
