@@ -65,7 +65,8 @@ def deploy():
                         {
                             "name": "deployer-job",
                             # "image": "registry.redhat.io/openshift4/ose-cli:latest",
-                            "image": "image-registry.openshift-image-registry.svc:5000/user20-vm-iac/job-runner-image:latest",
+                            #"image": "image-registry.openshift-image-registry.svc:5000/user20-vm-iac/job-runner-image:latest",
+                            "image": "image-registry.openshift-image-registry.svc:5000/virt-provision/job-runner-image:latest",
                             "command": ["/bin/bash", "-c"],
                             "args": [
                                 #f"/bin/bash",
