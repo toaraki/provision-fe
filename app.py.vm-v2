@@ -14,16 +14,19 @@ app = Flask(__name__)
 OPENSHIFT_API_URL = os.environ.get('OPENSHIFT_API_URL')
 TOKEN = os.environ.get('TOKEN')
 NAMESPACE = os.environ.get('NAMESPACE')
-SITE_STATUS = os.getenv('SITE_STATUS', 'open')
 
 @app.route('/', methods=['GET'])
 def index():
-    if SITE_STATUS == 'closed':
-        # Render a "closed" page if the environment variable is set
-        return render_template('closed.html')
-    else:
-        # Render the regular index page for the VM demo
-        return render_template('index.html')
+##    return """
+##    <h1>VM デプロイ</h1>
+##    <p>VMのホスト名を入力してください。</p>
+##    <form action="/deploy" method="post">
+##        <label for="hostname">ホスト名：</label>
+##        <input type="text" id="hostname" name="hostname" placeholder="例: my-fedora-vm" required>
+##        <button type="submit">デプロイ</button>
+##    </form>
+##    """
+      return render_template('index.html')
 
 @app.route('/deploy', methods=['POST'])
 def deploy():
@@ -120,6 +123,15 @@ def deploy():
     }
 
     # JobをOpenShift APIに送信し、ステータスページにリダイレクト
+    ##try:
+    ##    api_url = f"{OPENSHIFT_API_URL}/apis/batch/v1/namespaces/{NAMESPACE}/jobs"
+    ##    response = requests.post(api_url, json=job_manifest, headers=headers, verify=False)
+    ##    if response.status_code == 201:
+    ##        return redirect(url_for('status_page', job_name=job_name))
+    ##    else:
+    ##        return f"<h1>デプロイ失敗</h1><p>エラー: {response.text}</p>"
+    ##except Exception as e:
+    ##    return f"<h1>通信エラー</h1><p>エラー: {str(e)}</p>"
     try:
         api_url = f"{OPENSHIFT_API_URL}/apis/batch/v1/namespaces/{NAMESPACE}/jobs"
         response = requests.post(api_url, json=job_manifest, headers=headers, verify=False)
