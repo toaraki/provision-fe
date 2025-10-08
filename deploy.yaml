@@ -31,6 +31,8 @@ spec:
                   key: token
             - name: PORT
               value: "8080"
+            - name: SITE_STATUS
+              value: "open"
           resources:
             requests:
               memory: "50Mi"
